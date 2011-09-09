@@ -185,7 +185,7 @@ static void evspy_event(struct input_handle *handle, unsigned int type,
 		return;
 	}
 
-	// Special/unknown keys (alt, ctrl, esc, mayus, etc)
+	// Special/unknown keys (alt, ctrl, esc, shift, etc)
 	if (map[code] == '.' && likely(code != KEY_DOT))
 		special_char(code, value);
 
