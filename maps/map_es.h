@@ -1,29 +1,35 @@
 /*
- * ## KEYBOARD LAYOUT MAPS ##
+ * ## SPANISH KEYBOARD LAYOUT ## *
  *
- * Each map is an array where the content of each position is the key value
- * associated with the event code (index). An special/unknown key is represented
- * as a dot ('.'). The dot key itself has its own macro (KEY_DOT).
- *
- * By the moment, evspy does not support non-ascii characters.
- *
- * Select your map with EVS_MAP macro in evspy-core.h
  */
 
-#ifndef __MAPS
-#define __MAPS
+#ifndef __MAP_ES
+#define __MAP_ES
 
-#define EVS_KLAY_EN	0		// English standard layout
-#define EVS_KLAY_ES	1		// Spanish standard layout
-
-#ifndef EVS_KLAY
-#define EVS_KLAY	EVS_KLAY_EN		// In case it is not defined in evspy-core.h
-#endif	// EVS_KEYBOARD
-
-#if EVS_KLAY == EVS_KLAY_ES
-
-// Spanish
-static char map_es[] = {
+static void init_shiftmap(void)
+{
+	init_shiftmap_global();
+	EVS_SHIFT(KEY_1, "!");
+	EVS_SHIFT(KEY_2, "\"");
+	EVS_SHIFT(KEY_4, "$");
+	EVS_SHIFT(KEY_5, "%");
+	EVS_SHIFT(KEY_6, "&");
+	EVS_SHIFT(KEY_7, "/");
+	EVS_SHIFT(KEY_8, "(");
+	EVS_SHIFT(KEY_9, ")");
+	EVS_SHIFT(KEY_0, "=");
+	EVS_SHIFT(KEY_MINUS, "?");
+	EVS_SHIFT(KEY_EQUAL, "?");		// TODO change to '¿'
+	EVS_SHIFT(KEY_LEFTBRACE, "^");
+	EVS_SHIFT(KEY_RIGHTBRACE, "*");
+	EVS_SHIFT(KEY_SEMICOLON, "N");	// TODO change to 'Ñ'
+//	EVS_SHIFT(KEY_GRAVE, "Ç");		// TODO enable
+	EVS_SHIFT(KEY_COMMA, ";");
+	EVS_SHIFT(KEY_DOT, ":");
+	EVS_SHIFT(KEY_SLASH, "_");
+	EVS_SHIFT(KEY_102ND, ">");
+}
+static char map[] = {
 	'.', '.', '1', '2', '3',	//0		// 1:ESC
 	'4', '5', '6', '7', '8',	//5
 	'9', '0', '\'', '!', '\b',	//10	// 13:¡ (NOASCII) 14:BACKSPACE
@@ -48,5 +54,5 @@ static char map_es[] = {
 	'.', '.', '.', '.', '.',	//105	// 105:l_arrow 106:r_arrow 108:dwn_arrow
 };
 
-#endif	// EVS_KLAY == es
-#endif	// __MAPS
+
+#endif	// __MAP_ES

@@ -55,7 +55,7 @@ void khm_display(struct khashmap *head)
 	}
 }
 
-struct khashmap *khm_create(void)
+inline struct khashmap *khm_create(void)
 {
 	struct khashmap *head;
 
@@ -64,8 +64,6 @@ struct khashmap *khm_create(void)
 		return NULL;
 
 	INIT_LIST_HEAD(&head->l);
-	head->value = 0;
-	head->data = NULL;
 
 	return head;
 }
@@ -98,8 +96,6 @@ int khm_insert(struct khashmap *head, int value, void *data)
 
 	new->value = value;
 	new->data = data;
-
-	INIT_LIST_HEAD(&new->l);
 	list_add_tail(&new->l, &head->l);
 
 	return 0;

