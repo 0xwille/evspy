@@ -7,8 +7,20 @@
  *
  * By the moment, evspy does not support non-ascii characters.
  *
- * Select your map with EVS_MAP macro in evspy.h
+ * Select your map with EVS_MAP macro in evspy-core.h
  */
+
+#ifndef __MAPS
+#define __MAPS
+
+#define EVS_KLAY_EN	0		// English standard layout
+#define EVS_KLAY_ES	1		// Spanish standard layout
+
+#ifndef EVS_KLAY
+#define EVS_KLAY	EVS_KLAY_EN		// In case it is not defined in evspy-core.h
+#endif	// EVS_KEYBOARD
+
+#if EVS_KLAY == EVS_KLAY_ES
 
 // Spanish
 static char map_es[] = {
@@ -35,3 +47,6 @@ static char map_es[] = {
 	'.', '.', '.', '.', '.',	//100	// 100:ALTGR 103:up_arrow
 	'.', '.', '.', '.', '.',	//105	// 105:l_arrow 106:r_arrow 108:dwn_arrow
 };
+
+#endif	// EVS_KLAY == es
+#endif	// __MAPS

