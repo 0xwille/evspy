@@ -40,8 +40,13 @@ Once it has been installed, you can load it when you want with
 ** OTHER **
 
 A patch is supplied (evspy.patch) to be able to compile a kernel with evspy
-included; just cd to your Linux source tree, copy all the evspy files
-(*.c *.h maps khm) to drivers/input/, and apply the patch.
+included. If KERN is the directory where your kernel is located, just copy the
+patch there (KERN/) and copy all the evspy files (*.c, *.h, maps, khm) to
+KERN/drivers/input/. Then, cd to KERN and apply the patch:
+	$ patch -p1 < evspy.patch
+
 Then you should be able to configure the kernel to include evspy just like
 any other module:
-	Device Drivers --> Input device support --> Event based keylogger
+	$ make menuconfig
+		Device Drivers --> Input device support --> Event based keylogger
+	$ ...
