@@ -87,6 +87,7 @@
 	} else {		\
 		__vp = khm_get(shm, (c));		\
 		if (__vp) __c = *(char *)__vp;		\
+		else __c = map[c];		\
 	}		\
 	__c;		\
 })

