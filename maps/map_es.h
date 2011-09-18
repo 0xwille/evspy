@@ -29,6 +29,7 @@ static void init_shiftmap(void)
 	EVS_SHIFT(KEY_SLASH, "_");
 	EVS_SHIFT(KEY_102ND, ">");
 }
+
 static char map[] = {
 	'.', '.', '1', '2', '3',	//0		// 1:ESC
 	'4', '5', '6', '7', '8',	//5
@@ -50,8 +51,6 @@ static char map[] = {
 	'.', '<', '.', '.', '.',	//85
 	'.', '.', '.', '.', '.',	//90
 	'.', '\n', '.', '/', '.',	//95	// 97:RCTRL
-	'.', '.', '.', '.', '.',	//100	// 100:ALTGR 103:up_arrow
-	'.', '.', '.', '.', '.',	//105	// 105:l_arrow 106:r_arrow 108:dwn_arrow
 };
 
 

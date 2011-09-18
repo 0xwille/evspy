@@ -268,4 +268,4 @@ module_exit(evspy_exit);
 MODULE_AUTHOR("Guillermo Ramos <0xwille@gmail.com>");
 MODULE_DESCRIPTION("Event based keylogger");
 MODULE_LICENSE("GPL");
-MODULE_VERSION("0.1");
+MODULE_VERSION("0.2");
