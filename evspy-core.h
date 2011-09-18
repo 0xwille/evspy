@@ -18,6 +18,11 @@
 
 #include "maps/maps.h"
 
+// Event values
+#define	EVS_VAL_FREE		0
+#define	EVS_VAL_PRESS		1
+#define	EVS_VAL_HOLD		2
+
 #define MIN(x, y)	(x) < (y) ? (x) : (y)
 
 /*
@@ -66,6 +71,18 @@
 })
 
 /*
+ * Try to delete the last char inserted. If it is a special key ("[KEY]"),
+ * insert "[<<]" instead
+ */
+#define evs_backspace()		\
+({		\
+	if (*(wrp-1) != ']')		\
+		evs_delete();		\
+	else		\
+		special_char(KEY_BACKSPACE, EVS_VAL_PRESS);		\
+})
+
+/*
  * Is the c event code associated to any of the FX buttons?
  */
 #define evs_isfX(c)			\
@@ -91,8 +108,3 @@
 	}		\
 	__c;		\
 })
-
-// Event values
-#define	EVS_VAL_FREE		0
-#define	EVS_VAL_PRESS		1
-#define	EVS_VAL_HOLD		2

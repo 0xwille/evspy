@@ -1,4 +1,4 @@
-* Fix backspace key (do not erase special key events) - Prio:Medium
-* Implement 2nd mapping (shift) - Prio:Medium		FIXED
+* Differenciate between capslock and shift (they do not behave the same with
+  non-alphanumeric keys) - Prio:Low
 * Take a look at kernel's circular buffer API - Prio:Low
 * Which FX key has been pressed? - Prio:None
