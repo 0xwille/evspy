@@ -3,12 +3,12 @@
  *
  */
 
-#ifndef __MAP_EN
-#define __MAP_EN
+#ifndef __EVS_MAP_EN
+#define __EVS_MAP_EN
 
 static void init_shiftmap(void)
 {
-	init_shiftmap_global();
+	shm = khm_create();
 	EVS_SHIFT(KEY_1, "!");
 	EVS_SHIFT(KEY_2, "@");
 	EVS_SHIFT(KEY_3, "#");
@@ -57,4 +57,4 @@ static char map[] = {
 };
 
 
-#endif	// __MAP_EN
+#endif	// __EVS_MAP_EN

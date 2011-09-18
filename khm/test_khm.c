@@ -40,7 +40,7 @@ static int __init test_init(void)
 	else
 		printk(KERN_ALERT "Z_BLR does not exist\n");
 
-	if (khm_insert(hm, Z_ASD, "MALO!!"))
+	if (khm_insert(hm, Z_ASD, "REPEATED!!"))
 		goto insert_err;
 
 	return 0;

@@ -1,5 +1,3 @@
-** INTRO **
-
 Evspy is a general purpose kernel-mode keylogger in (early) development stage.
 
 The file from where you can read the registered keystrokes is /proc/driver/evspy
@@ -9,22 +7,18 @@ Don't be evil.
 
 
 ** COMPILE **
-
 	$ make
 
 
 ** LOAD **
-
 	# insmod evspy.ko
 
 
 ** UNLOAD **
-
 	# rmmod evspy
 
 
 ** IS IT ALREADY LOADED? **
-
 	$ lsmod | grep evspy
 
 
@@ -32,24 +26,22 @@ Don't be evil.
 
 If you want evspy to be loaded every time system boots, copy it into your
 kernel module dir:
-
 	# cp evspy.ko /lib/modules/$(uname -r)/kernel/drivers/input/evspy.ko
 
 and update module database:
-
 	# depmod -a
 
 (In some distros it could also be necessary to add it to some rc/config file)
 
 Once it has been installed, you can load it when you want with
-
 	# modprobe evspy
 
 
 ** OTHER **
 
 A patch is supplied (evspy.patch) to be able to compile a kernel with evspy
-included; just cd to your Linux source tree, copy all the evspy files (*.c *.h)
-to drivers/input/, and apply the patch. Then you should be able to configure the
-kernel to include evspy just like any other module:
+included; just cd to your Linux source tree, copy all the evspy files
+(*.c *.h maps khm) to drivers/input/, and apply the patch.
+Then you should be able to configure the kernel to include evspy just like
+any other module:
 	Device Drivers --> Input device support --> Event based keylogger
