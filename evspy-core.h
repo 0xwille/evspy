@@ -142,18 +142,13 @@
  * Returns the character associated with event code c when altgr is pressed
  */
 #ifdef EVS_ALTGR_ENABLED
-#	define evs_altgr(c)		\
-		({		\
-		void *__vp;		\
-		char __c;		\
-		__vp = khm_get(ahm, (c));		\
-		if (__vp) __c = *(char *)__vp;		\
-		else __c = map[c];		\
-		__c;		\
-	})
-#else
-#	define evs_altgr(c)		\
+#define evs_altgr(c)		\
 	({		\
-		(c);		\
-	})
+	void *__vp;		\
+	char __c;		\
+	__vp = khm_get(ahm, (c));		\
+	if (__vp) __c = *(char *)__vp;		\
+	else __c = map[c];		\
+	__c;		\
+})
 #endif

