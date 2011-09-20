@@ -29,15 +29,6 @@
 #include <linux/input.h>
 #include "../khm/khm.h"
 
-#define EVS_SHIFT(KEY, VALUE)	khm_insert(shm, (KEY), (VALUE))
-
-// Shift map
-static struct khashmap *shm;
-
-static inline void exit_shiftmap(void)
-{
-	khm_destroy(shm);
-}
 
 // Load the map associated with the given keyboard layout
 #ifndef EVS_KLAY

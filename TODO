@@ -1,5 +1,3 @@
-* Register ALTGR-KEY - Prio:Mid
-
 * Differenciate between capslock and shift (they do not behave the same with
 	non-alphanumeric keys) - Prio:Low
 * Support non-ascii characters - Prio:Low

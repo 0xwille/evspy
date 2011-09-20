@@ -111,7 +111,7 @@
 /*
  * Is the c event code associated to any of the FX buttons?
  */
-#define evs_isfX(c)			\
+#define evs_isfX(c)		\
 ({		\
 	((c) >= KEY_F1 && (c) <= KEY_F10) ||		\
 	((c) == KEY_F11 || (c) == KEY_F12) ||		\
@@ -134,3 +134,23 @@
 	}		\
 	__c;		\
 })
+
+/*
+ * Returns the character associated with event code c when altgr is pressed
+ */
+#ifdef EVS_ALTGR_ENABLED
+#	define evs_altgr(c)		\
+		({		\
+		void *__vp;		\
+		char __c;		\
+		__vp = khm_get(ahm, (c));		\
+		if (__vp) __c = *(char *)__vp;		\
+		else __c = map[c];		\
+		__c;		\
+	})
+#else
+#	define evs_altgr(c)		\
+	({		\
+		(c);		\
+	})
+#endif

@@ -1,6 +1,6 @@
 #include <linux/module.h>
 #include <linux/init.h>
-#include "khashmap.h"
+#include "khm.h"
 
 #define Z_ASD	1
 #define Z_QWE	2
@@ -13,6 +13,11 @@ static int __init test_init(void)
 	char *values;
 
 	hm = khm_create();
+
+	if ((values = (char*)khm_get(hm, Z_BLR)))
+		printk(KERN_ALERT "ERROR: Z_BLR exists: %s\n", values);
+	else
+		printk(KERN_ALERT "Z_BLR does not exist (good)\n");
 
 	if (khm_insert(hm, Z_ASD, "ASDF"))
 		goto insert_err;
@@ -46,7 +51,7 @@ static int __init test_init(void)
 	return 0;
 
 insert_err:
-	printk(KERN_ALERT "Error inserting!\n");
+	printk(KERN_ALERT "Error inserting (good)\n");
 	return 0;
 }
 

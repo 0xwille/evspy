@@ -6,31 +6,42 @@
 #ifndef __EVS_MAP_EN
 #define __EVS_MAP_EN
 
+
+// Shift map
+#define EVS_SHIFT_BIND(KEY, VALUE)	khm_insert(shm, (KEY), (VALUE))
+
+static struct khashmap *shm;
+
 static void init_shiftmap(void)
 {
 	shm = khm_create();
-	EVS_SHIFT(KEY_1, "!");
-	EVS_SHIFT(KEY_2, "@");
-	EVS_SHIFT(KEY_3, "#");
-	EVS_SHIFT(KEY_4, "$");
-	EVS_SHIFT(KEY_5, "%");
-	EVS_SHIFT(KEY_6, "^");
-	EVS_SHIFT(KEY_7, "&");
-	EVS_SHIFT(KEY_8, "*");
-	EVS_SHIFT(KEY_9, "(");
-	EVS_SHIFT(KEY_0, ")");
-	EVS_SHIFT(KEY_MINUS, "_");
-	EVS_SHIFT(KEY_EQUAL, "+");
-	EVS_SHIFT(KEY_LEFTBRACE, "{");
-	EVS_SHIFT(KEY_RIGHTBRACE, "}");
-	EVS_SHIFT(KEY_SEMICOLON, ":");
-	EVS_SHIFT(KEY_APOSTROPHE, "\"");
-	EVS_SHIFT(KEY_GRAVE, "|");
-	EVS_SHIFT(KEY_BACKSLASH, "|");
-	EVS_SHIFT(KEY_COMMA, "<");
-	EVS_SHIFT(KEY_DOT, ">");
-	EVS_SHIFT(KEY_SLASH, "?");
-	EVS_SHIFT(KEY_102ND, ">");
+	EVS_SHIFT_BIND(KEY_1, "!");
+	EVS_SHIFT_BIND(KEY_2, "@");
+	EVS_SHIFT_BIND(KEY_3, "#");
+	EVS_SHIFT_BIND(KEY_4, "$");
+	EVS_SHIFT_BIND(KEY_5, "%");
+	EVS_SHIFT_BIND(KEY_6, "^");
+	EVS_SHIFT_BIND(KEY_7, "&");
+	EVS_SHIFT_BIND(KEY_8, "*");
+	EVS_SHIFT_BIND(KEY_9, "(");
+	EVS_SHIFT_BIND(KEY_0, ")");
+	EVS_SHIFT_BIND(KEY_MINUS, "_");
+	EVS_SHIFT_BIND(KEY_EQUAL, "+");
+	EVS_SHIFT_BIND(KEY_LEFTBRACE, "{");
+	EVS_SHIFT_BIND(KEY_RIGHTBRACE, "}");
+	EVS_SHIFT_BIND(KEY_SEMICOLON, ":");
+	EVS_SHIFT_BIND(KEY_APOSTROPHE, "\"");
+	EVS_SHIFT_BIND(KEY_GRAVE, "|");
+	EVS_SHIFT_BIND(KEY_BACKSLASH, "|");
+	EVS_SHIFT_BIND(KEY_COMMA, "<");
+	EVS_SHIFT_BIND(KEY_DOT, ">");
+	EVS_SHIFT_BIND(KEY_SLASH, "?");
+	EVS_SHIFT_BIND(KEY_102ND, ">");
+}
+
+static inline void exit_shiftmap(void)
+{
+	khm_destroy(shm);
 }
 
 static char map[] = {
