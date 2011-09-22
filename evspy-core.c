@@ -187,11 +187,9 @@ static void evspy_event(struct input_handle *handle, unsigned int type,
 	} else if (code == KEY_BACKSPACE && value == EVS_VAL_PRESS) {
 		evs_backspace();
 		return;
-	}
 
 	// Special/unknown keys (alt, ctrl, esc, shift, etc)
-	if (unlikely(code >= sizeof(map)) ||
-			(map[code] == '.' && likely(code != KEY_DOT))) {
+	} else if (code >= sizeof(map) || (map[code] == '.' && likely(code != KEY_DOT))) {
 		special_char(code, value);
 
 	// "Immediate" keys (alphanumeric + some symbols)

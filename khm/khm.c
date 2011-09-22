@@ -65,7 +65,7 @@ inline struct khashmap *khm_create(void)
 	struct khashmap *head;
 
 	head = kmalloc(sizeof(struct khashmap), GFP_KERNEL);
-	if (!head)
+	if (unlikely(!head))
 		return NULL;
 
 	INIT_LIST_HEAD(&head->l);
@@ -102,7 +102,7 @@ int khm_insert(struct khashmap *head, int value, void *data)
 		return -EINVAL;
 
 	new = khm_create();
-	if (!new)
+	if (unlikely(!new))
 		return -ENOMEM;
 
 	new->value = value;

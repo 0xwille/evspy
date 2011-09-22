@@ -92,8 +92,8 @@
  */
 #define evs_delete()		\
 ({		\
-	if (wrp != rdp && evs_decp(wrp) == rdp)		\
-		evs_decp(rdp);		\
+	if (likely(wrp != rdp))		\
+		evs_decp(wrp);		\
 })
 
 /*
