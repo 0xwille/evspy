@@ -11,13 +11,13 @@
  * position is the key value associated with the event code (index). It also
  * defines a function called init_shiftmap that can register any number of shift
  * keys to be parsed when shift or capslock has been pressed, and exit_shiftmap,
- * that cleans up the map (by default, it just destroys the hashmap used by the
+ * that cleans up the map (by default, it just destroys the map used by the
  * previous function).
  *
  * For example,
  * 		EVS_SHIFT(KEY_7, "/");
  * associates the key of number 7 to the slash character when shift is pressed.
- * Yeah, the character associated is a string: this is because of the hashmap
+ * Yeah, the character associated is a string: this is because of the map (kmap)
  * implementation, [int -> (void *)].
  *
  * From version 0.3 up, you can also define how evspy should register AltGr-key
@@ -34,7 +34,7 @@
 #define __EVS_MAPS
 
 #include <linux/input.h>
-#include "../khm/khm.h"
+#include "../kmap/kmap.h"
 
 
 // Load the map associated with the given keyboard layout

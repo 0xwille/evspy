@@ -30,7 +30,7 @@
 #include <linux/stat.h>
 #include <linux/string.h>
 #include <asm/page.h>
-#include "khm/khm.h"
+#include "kmap/kmap.h"
 
 // Keyboard layouts
 #define EVS_KLAY_EN		0
@@ -130,7 +130,7 @@
 	} else if (is_ascii(c) || !shift_on) {		\
 		__c = map[c];		\
 	} else {		\
-		if ((__vp = khm_get(shm, (c))))		\
+		if ((__vp = kmap_get(skm, (c))))		\
 			__c = *(char *)__vp;		\
 		else		\
 			__c = map[c];		\
@@ -146,7 +146,7 @@
 	({		\
 	void *__vp;		\
 	char __c;		\
-	__vp = khm_get(ahm, (c));		\
+	__vp = kmap_get(akm, (c));		\
 	if (__vp) __c = *(char *)__vp;		\
 	else __c = map[c];		\
 	__c;		\

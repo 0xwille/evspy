@@ -8,13 +8,13 @@
 
 
 // Shift map
-#define EVS_SHIFT_BIND(KEY, VALUE)	khm_insert(shm, (KEY), (VALUE))
+#define EVS_SHIFT_BIND(KEY, VALUE)	kmap_insert(skm, (KEY), (VALUE))
 
-static struct khashmap *shm;
+static struct kmap *skm;
 
 static void init_shiftmap(void)
 {
-	shm = khm_create();
+	skm = kmap_create();
 	EVS_SHIFT_BIND(KEY_1, "!");
 	EVS_SHIFT_BIND(KEY_2, "@");
 	EVS_SHIFT_BIND(KEY_3, "#");
@@ -41,7 +41,7 @@ static void init_shiftmap(void)
 
 static inline void exit_shiftmap(void)
 {
-	khm_destroy(shm);
+	kmap_destroy(skm);
 }
 
 static char map[] = {

@@ -41,7 +41,7 @@ Once it has been installed, you can load it when you want with
 
 A patch is supplied (evspy.patch) to be able to compile a kernel with evspy
 included. If KERN is the directory where your kernel is located, just copy the
-patch there (KERN/) and copy all the evspy files (*.c, *.h, maps, khm) to
+patch there (KERN/) and copy all the evspy files (*.c, *.h, maps, kmap) to
 KERN/drivers/input/. Then, cd to KERN and apply the patch:
 	$ patch -p1 < evspy.patch
 

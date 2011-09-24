@@ -1,5 +1,5 @@
 obj-m += test.o
-test-objs := khm.o test_khm.o
+test-objs := kmap.o test_kmap.o
 
 all:
 	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
