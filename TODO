@@ -1,4 +1,3 @@
 * Support non-ascii characters - Prio:Low
-* Take a look at kernel's circular buffer API - Prio:Low
 
 * Which FX key has been pressed? - Prio:None

