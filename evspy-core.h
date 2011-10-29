@@ -52,61 +52,16 @@
 #define is_ascii(c) (map[c] >= 'a' && map[c] <= 'z')
 
 /*
- * If pointer is at the end of buffer, put it at the beginning.
- * If not, simply add 1 to it.
- */
-#define evs_incp(p)		\
-({		\
-	if ((p) == &buffer[EVS_BUFSIZE-1])		\
-		(p) = buffer;		\
-	else		\
-		(p)++;		\
- 	(p);		\
-})
-
-/*
- * Same as evs_incp but backwards
- */
-#define evs_decp(p)		\
-({		\
-	if ((p) == buffer)		\
-		(p) = &buffer[EVS_BUFSIZE-1];		\
-	else		\
-		(p)--;		\
- 	(p);		\
-})
-
-/*
- * Insert character c where wrp is pointing and move it to the next char.
- * If rdp == wrp, increase rdp too.
- */
-#define evs_insert(c)		\
-({		\
-	*wrp = (c);		\
-	if (evs_incp(wrp) == rdp)		\
-		evs_incp(rdp);		\
-})
-
-/*
- * Remove a character from the buffer
- */
-#define evs_delete()		\
-({		\
-	if (likely(wrp != rdp))		\
-		evs_decp(wrp);		\
-})
-
-/*
  * Try to delete the last char inserted. If it is a special key ("[KEY]"),
  * insert "[<<]" instead
  */
-#define evs_backspace()		\
-({		\
-	if (*(wrp-1) != ']')		\
-		evs_delete();		\
-	else		\
-		special_char(KEY_BACKSPACE, EVS_VAL_PRESS);		\
-})
+//#define evs_backspace()		\
+//({		\
+//	if (*(wrp-1) != ']')		\
+// 
+//	else		\
+//		special_char(KEY_BACKSPACE, EVS_VAL_PRESS);		\
+//})
 
 /*
  * Is the c event code associated to any of the FX buttons?
