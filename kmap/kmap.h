@@ -21,8 +21,9 @@
 
 #include <linux/list.h>
 
-#ifndef KHM
-#define KHM
+#ifndef _KMAP_H
+#define _KMAP_H
+
 
 struct kmap {
 	struct list_head l;
@@ -38,4 +39,5 @@ void *kmap_get(struct kmap *head, int value);
 void kmap_set(struct kmap *head, int value, void *data);
 void kmap_display(struct kmap *head);
 
-#endif	// KHM
+
+#endif		/* _KMAP_H */

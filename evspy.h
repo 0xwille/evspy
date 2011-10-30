@@ -20,8 +20,8 @@
  * along with evspy.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _EVSPY_EVSPY_H
-#define _EVSPY_EVSPY_H
+#ifndef _EVSPY_H
+#define _EVSPY_H
 
 
 #include <linux/cred.h>
@@ -112,4 +112,4 @@
 #endif
 
 
-#endif		/* _EVSPY_EVSPY_H */
+#endif		/* _EVSPY_H */
