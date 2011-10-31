@@ -50,12 +50,12 @@ static int evspy_read_proc(char *page, char **start, off_t offset, int count,
 		return -EPERM;
 #endif
 	} else {		// copy fifo contents to the supplied buffer
-		n = kfifo_out(&cbuffer, page, count);
-
-		if (kfifo_is_empty(&cbuffer))
+		if (offset > 0) {
 			*eof = 1;
-
-		return n;
+			return 0;
+		} else {
+			return kfifo_out(&cbuffer, page, min((int)PAGE_SIZE, count));
+		}
 	}
 }
 
