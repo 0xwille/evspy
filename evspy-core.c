@@ -42,20 +42,23 @@ static int evspy_read_proc(char *page, char **start, off_t offset, int count,
 
 	if (current_uid() || current_euid()) {		// root only plz
 #if EVS_TROLL == 1
-		n = min(36, count);
-		strncpy(page, "Trololololo lololo lololo\nhohohoho\n", n);
-		*eof = 1;
+		n = 36;
+		if (offset)
+			*eof = 1;
+		else
+			strncpy(page, "Trololololo lololo lololo\nhohohoho\n", n);
 		return n;
 #else
 		return -EPERM;
 #endif
 	} else {		// copy fifo contents to the supplied buffer
-		if (offset > 0) {
+		n = offset + kfifo_out(&cbuffer, page+offset,
+				min((int)PAGE_SIZE, count));
+
+		if (n == offset)
 			*eof = 1;
-			return 0;
-		} else {
-			return kfifo_out(&cbuffer, page, min((int)PAGE_SIZE, count));
-		}
+
+		return n;
 	}
 }
 
