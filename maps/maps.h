@@ -15,7 +15,7 @@
  * previous function).
  *
  * For example,
- * 		EVS_SHIFT(KEY_7, "/");
+ *   EVS_SHIFT(KEY_7, "/");
  * associates the key of number 7 to the slash character when shift is pressed.
  * Yeah, the character associated is a string: this is because of the map (kmap)
  * implementation, [int -> (void *)].
@@ -39,11 +39,12 @@
 
 // Load the map associated with the given keyboard layout
 #ifndef EVS_KLAY
-#include "map_es.h"		// default layout
+# include "map_es.h"             // default layout
 #elif EVS_KLAY == EVS_KLAY_EN
-#include "map_en.h"
+# include "map_en.h"
 #elif EVS_KLAY == EVS_KLAY_ES
-#include "map_es.h"
-#endif	// EVS_KLAY
+# include "map_es.h"
+#endif  // EVS_KLAY
 
-#endif	// __EVS_MAPS
+
+#endif // __EVS_MAPS

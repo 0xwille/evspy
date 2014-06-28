@@ -29,16 +29,16 @@
  */
 static inline struct kmap *kmap_search(struct kmap *head, int value)
 {
-	struct list_head *list;
-	struct kmap *node;
+    struct list_head *list;
+    struct kmap *node;
 
-	list_for_each(list, &head->l) {
-		node = list_entry(list, struct kmap, l);
-		if (node->value == value)
-			return node;
-	}
+    list_for_each(list, &head->l) {
+        node = list_entry(list, struct kmap, l);
+        if (node->value == value)
+            return node;
+    }
 
-	return NULL;
+    return NULL;
 }
 
 /*
@@ -46,15 +46,15 @@ static inline struct kmap *kmap_search(struct kmap *head, int value)
  */
 void kmap_display(struct kmap *head)
 {
-	struct kmap *node;
-	struct list_head *list;
+    struct kmap *node;
+    struct list_head *list;
 
-	printk(KERN_ALERT "Displaying...");
-	list_for_each(list, &head->l) {
-		node = list_entry(list, struct kmap, l);
-		printk(KERN_ALERT "  %p: v=%d d=%s\n",
-				node, node->value, (char*)node->data);
-	}
+    printk(KERN_ALERT "Displaying...");
+    list_for_each(list, &head->l) {
+        node = list_entry(list, struct kmap, l);
+        printk(KERN_ALERT "  %p: v=%d d=%s\n",
+               node, node->value, (char*)node->data);
+    }
 }
 
 /*
@@ -62,15 +62,15 @@ void kmap_display(struct kmap *head)
  */
 inline struct kmap *kmap_create(void)
 {
-	struct kmap *head;
+    struct kmap *head;
 
-	head = kmalloc(sizeof(struct kmap), GFP_KERNEL);
-	if (unlikely(!head))
-		return NULL;
+    head = kmalloc(sizeof(struct kmap), GFP_KERNEL);
+    if (unlikely(!head))
+        return NULL;
 
-	INIT_LIST_HEAD(&head->l);
+    INIT_LIST_HEAD(&head->l);
 
-	return head;
+    return head;
 }
 
 /*
@@ -78,16 +78,16 @@ inline struct kmap *kmap_create(void)
  */
 void kmap_destroy(struct kmap *head)
 {
-	struct kmap *node;
-	struct list_head *list = head->l.next;
+    struct kmap *node;
+    struct list_head *list = head->l.next;
 
-	while (list != &head->l) {
-		node = list_entry(list, struct kmap, l);
-		list = list->next;
-		kfree(node);
-	}
+    while (list != &head->l) {
+        node = list_entry(list, struct kmap, l);
+        list = list->next;
+        kfree(node);
+    }
 
-	kfree(head);
+    kfree(head);
 }
 
 /*
@@ -95,21 +95,21 @@ void kmap_destroy(struct kmap *head)
  */
 int kmap_insert(struct kmap *head, int value, void *data)
 {
-	struct kmap *new;
+    struct kmap *new;
 
-	// Key already exists
-	if (kmap_search(head, value))
-		return -EINVAL;
+    // Key already exists
+    if (kmap_search(head, value))
+        return -EINVAL;
 
-	new = kmap_create();
-	if (unlikely(!new))
-		return -ENOMEM;
+    new = kmap_create();
+    if (unlikely(!new))
+        return -ENOMEM;
 
-	new->value = value;
-	new->data = data;
-	list_add_tail(&new->l, &head->l);
+    new->value = value;
+    new->data = data;
+    list_add_tail(&new->l, &head->l);
 
-	return 0;
+    return 0;
 }
 
 /*
@@ -117,15 +117,15 @@ int kmap_insert(struct kmap *head, int value, void *data)
  */
 int kmap_delete(struct kmap *head, int value)
 {
-	struct kmap *node = kmap_search(head, value);
+    struct kmap *node = kmap_search(head, value);
 
-	if (node) {
-		list_del(&node->l);
-		kfree(node);
-		return 0;
-	} else {
-		return -EINVAL;
-	}
+    if (node) {
+        list_del(&node->l);
+        kfree(node);
+        return 0;
+    } else {
+        return -EINVAL;
+    }
 }
 
 /*
@@ -134,12 +134,12 @@ int kmap_delete(struct kmap *head, int value)
  */
 void *kmap_get(struct kmap *head, int value)
 {
-	struct kmap *node = kmap_search(head, value);
+    struct kmap *node = kmap_search(head, value);
 
-	if (node)
-		return node->data;
-	else
-		return NULL;
+    if (node)
+        return node->data;
+    else
+        return NULL;
 }
 
 /*
@@ -147,8 +147,8 @@ void *kmap_get(struct kmap *head, int value)
  */
 void kmap_set(struct kmap *head, int value, void *data)
 {
-	struct kmap *node = kmap_search(head, value);
+    struct kmap *node = kmap_search(head, value);
 
-	if (node)
-		node->data = data;
+    if (node)
+        node->data = data;
 }

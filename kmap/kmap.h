@@ -26,9 +26,9 @@
 
 
 struct kmap {
-	struct list_head l;
-	int value;
-	void *data;
+    struct list_head l;
+    int value;
+    void *data;
 };
 
 struct kmap *kmap_create(void);
@@ -40,4 +40,4 @@ void kmap_set(struct kmap *head, int value, void *data);
 void kmap_display(struct kmap *head);
 
 
-#endif		/* _KMAP_H */
+#endif /* _KMAP_H */
