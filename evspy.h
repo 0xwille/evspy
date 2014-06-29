@@ -63,7 +63,7 @@
     ({                            \
         if (kfifo_is_full(fifop)) \
             kfifo_skip(fifop);    \
-        kfifo_put((fifop), c);    \
+        kfifo_put(fifop, *c);     \
     })
 
 /*

